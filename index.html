@@ -1,27 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.0.6/dist/full.css" rel="stylesheet" type="text/css" />
     <title>Calculadora</title>
 </head>
-<body>
-    <form>
-        <label for="amont">Cantidad</label>
-        <input id="amount" type="number" step="0.01">
-        <button>Calcular</button>
-    </form>
 
-    <div class="result">
-        <b>Ganancia final:</b> <span id="result"></span>
-        <br>
-        <b>Monto descontado:</b> <span id="discount"></span>
-        <br>--- <br>
-        <b>Precio sugerido </b>
-        <span>(para ganar el monto neto): </span>
-        <span id="suggested"></span>
+<style>
+    body {
+        background-color: rgb(216, 216, 216);
+        min-height: 100vh;
+        padding: 0 1rem;
+    }
+    .artboard {
+        margin: auto;
+        padding: 2rem;
+    }
+    #amount, #btn {
+        margin-bottom: 1rem;
+    }
+    .artboard.phone-1 {
+        height: fit-content;
+        width: 100%;
+        max-width: 380px;
+    }
+    .ganador {
+        color: #16a249;
+    }
+    .sol {
+        font-weight: lighter;
+        font-size: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+        .stats {
+            display: block;
+            max-width: 200px;
+        }
+    }
+</style>
+
+<body data-theme="light">
+    <br><br><br><br>
+    
+    <div class="artboard phone-1 artboard-demo">
+        <form class="form-control w-full max-w-xs">
+            <label class="label">
+                <span class="label-text">Ingresa el monto a calcular</span>
+                <span class="label-text-alt">(S/.)</span>
+            </label>
+            <input id="amount" type="number" step="0.01" placeholder="Ingresar monto" class="input w-full max-w-xs" max="150" min="0">
+            <button id="btn" class="btn btn-outline btn-accent">Calcular</button>
+        </form>
+        
     </div>
+    
+    <br><br>
+    <center>
+    <div class="shadow stats">
+  
+        <div class="stat place-items-center">
+          <div class="stat-title">Ganancia final</div>
+          <div class="stat-value" id="result"></div>
+          <div class="stat-desc">Lo que ganaras por la venta</div>
+        </div>
+        
+        <div class="stat place-items-center">
+          <div class="stat-title">Monto descontado</div>
+          <div data-theme="dark" id="discount" class="stat-value text-error"></div>
+          <div class="stat-desc text-secondary">↘︎ <span id="percentage"></span></div>
+        </div>
+        
+        <div class="stat place-items-center">
+          <div class="stat-title">Precio sugerido</div>
+          <div class="stat-value ganador" id="suggested"></div>
+          <div class="stat-desc">↗︎ para ganar el monto neto</div>
+        </div>
+        
+      </div>
+    </center>
+    <br><br>
+
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
         var form = document.querySelector('form')
@@ -29,13 +92,13 @@
         var result = document.getElementById("result")
         var discount = document.getElementById("discount")
         var suggested = document.getElementById("suggested")
+        var percen = document.getElementById('percentage')
 
         function calcSuggestedPrice(price, final_discount) {
             var val = price + final_discount + 0.1
             var final
             for (let i = 0; i < 5; i++) {
                 [final, _] = calcFinalPrice(val)
-                console.log(final)
                 if (final < price)
                     val += 0.1
                 else break
@@ -51,21 +114,42 @@
             return [price - final_discount, final_discount]
         }
 
+        function calcPercentage(price, discount) {
+            return discount*100 / price
+        }
+
         function roundAmount(amount) {
             return Math.ceil(amount * 100) / 100
+        }
+
+        function cleanDetails() {
+            result.innerText = ''
+            discount.innerText = ''
+            suggested.innerText = ''
+            percen.innerHTML = ''
+        }
+
+        function formatSoles(precio) {
+            return `<span class="sol">S/.</span>${precio}`
         }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault()
             var price = parseFloat(amount.value)
-            if (price === NaN) return
+            if (!price) {
+                cleanDetails()
+                return
+            }
             var [final_price, final_discount] = calcFinalPrice(price)
-            result.innerText = final_price
-            discount.innerText = final_discount
+            result.innerHTML = formatSoles(roundAmount(final_price))
+            discount.innerHTML = formatSoles(final_discount)
             var suggested_price = calcSuggestedPrice(price, final_discount)
-            suggested.innerText = suggested_price
+            suggested.innerHTML = formatSoles(suggested_price)
+            var percentage = calcPercentage(price, final_discount)
+            percen.innerText = percentage + '%'
         })
-        
+
     </script>
 </body>
+
 </html>
