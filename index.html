@@ -8,25 +8,39 @@
 </head>
 <body>
     <form>
+        <label for="amont">Cantidad</label>
         <input id="amount" type="number" step="0.05">
+        <button>Calcular</button>
     </form>
 
-    <script>
-        var amount = document.getElementById("amount")
-        var form = document.querySelector('form')
+    <div class="result">
+        <b>Precio final:</b> <span id="result"></span>
+        <br>
+        <b>Monto descontado:</b> <span id="discount"></span>
+    </div>
 
-        function calcFinalPrice() {
-            var price = parseFloat(amount.value)
-            if (price === NaN) return
-            var rate = price*0.0399 + 1
+    <script>
+        var form = document.querySelector('form')
+        var amount = document.getElementById("amount")
+        var result = document.getElementById("result")
+        var discount = document.getElementById("discount")
+
+        function calcFinalPrice(price) {
+            var rate = price * 0.0399 + 1
             var tax = rate * 0.18
-            var final_price = price - rate - tax
-            console.log(final_price)
+            var final_discount = rate + tax
+            final_discount = Math.ceil(final_discount * 100) / 100
+            return [price - final_discount, final_discount]
         }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault()
-            calcFinalPrice()
+            var price = parseFloat(amount.value)
+            if (price === NaN) return
+            var [final_price, final_discount] = calcFinalPrice(price)
+            result.innerText = final_price
+            discount.innerText = final_discount
+            calcSuggestedPrice(price, final_price)
         })
         
     </script>
