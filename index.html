@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+</head>
+<body>
+    <form>
+        <input id="amount" type="number" step="0.05">
+    </form>
+
+    <script>
+        var amount = document.getElementById("amount")
+        var form = document.querySelector('form')
+
+        function calcFinalPrice() {
+            var price = parseFloat(amount.value)
+            if (price === NaN) return
+            var rate = price*0.0399 + 1
+            var tax = rate * 0.18
+            var final_price = price - rate - tax
+            console.log(final_price)
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            calcFinalPrice()
+        })
+        
+    </script>
+</body>
+</html>
